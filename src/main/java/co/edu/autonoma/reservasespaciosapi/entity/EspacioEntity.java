@@ -15,17 +15,17 @@ public class EspacioEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "nombre", nullable = false, length = 100)
+    @Column(name = "nombre", nullable = false, length = 120)
     private String nombre;
 
     @Column(name = "capacidad", nullable = false)
     private Integer capacidad;
 
-    @Column(name = "ubicacion", nullable = false, length = 150)
+    @Column(name = "ubicacion", nullable = false, length = 180)
     private String ubicacion;
 
     @Column(name = "activo", nullable = false)
-    private Boolean activo;
+    private Boolean activo = true;
 
     /**
      * Constructor vacío requerido por JPA.
@@ -34,13 +34,23 @@ public class EspacioEntity {
     }
 
     /**
-     * Constructor con los campos principales.
+     * Constructor con campos principales.
      */
     public EspacioEntity(String nombre, Integer capacidad, String ubicacion, Boolean activo) {
         this.nombre = nombre;
         this.capacidad = capacidad;
         this.ubicacion = ubicacion;
         this.activo = activo;
+    }
+
+    /**
+     * Constructor alternativo compatible con DTOs.
+     */
+    public EspacioEntity(String nombre, String ubicacion, Integer capacidad, Boolean disponible) {
+        this.nombre = nombre;
+        this.ubicacion = ubicacion;
+        this.capacidad = capacidad;
+        this.activo = disponible;
     }
 
     // Getters y Setters
@@ -83,5 +93,13 @@ public class EspacioEntity {
 
     public void setActivo(Boolean activo) {
         this.activo = activo;
+    }
+
+    public Boolean getDisponible() {
+        return activo;
+    }
+
+    public void setDisponible(Boolean disponible) {
+        this.activo = disponible;
     }
 }

@@ -15,17 +15,20 @@ public class UsuarioEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "nombre", nullable = false, length = 100)
+    @Column(name = "nombre", nullable = false, length = 120)
     private String nombre;
 
-    @Column(name = "correo", nullable = false, unique = true, length = 150)
-    private String correo;
+    @Column(name = "correo_institucional", nullable = false, unique = true, length = 180)
+    private String correoInstitucional;
 
-    @Column(name = "rol", nullable = false, length = 50)
+    @Column(name = "contrasena", length = 255)
+    private String contrasena;
+
+    @Column(name = "rol", length = 50)
     private String rol;
 
     @Column(name = "activo", nullable = false)
-    private Boolean activo;
+    private Boolean activo = true;
 
     /**
      * Constructor vacío requerido por JPA.
@@ -34,11 +37,22 @@ public class UsuarioEntity {
     }
 
     /**
-     * Constructor con los campos principales.
+     * Constructor compatible con DTOs de autenticación y registro.
      */
-    public UsuarioEntity(String nombre, String correo, String rol, Boolean activo) {
+    public UsuarioEntity(String nombre, String correoInstitucional, String contrasena) {
         this.nombre = nombre;
-        this.correo = correo;
+        this.correoInstitucional = correoInstitucional;
+        this.contrasena = contrasena;
+        this.activo = true;
+    }
+
+    /**
+     * Constructor completo.
+     */
+    public UsuarioEntity(String nombre, String correoInstitucional, String contrasena, String rol, Boolean activo) {
+        this.nombre = nombre;
+        this.correoInstitucional = correoInstitucional;
+        this.contrasena = contrasena;
         this.rol = rol;
         this.activo = activo;
     }
@@ -46,12 +60,10 @@ public class UsuarioEntity {
     // Getters y Setters
 
     public Long getId() {
-
         return id;
     }
 
     public void setId(Long id) {
-
         this.id = id;
     }
 
@@ -60,18 +72,32 @@ public class UsuarioEntity {
     }
 
     public void setNombre(String nombre) {
-
         this.nombre = nombre;
     }
 
-    public String getCorreo() {
+    public String getCorreoInstitucional() {
+        return correoInstitucional;
+    }
 
-        return correo;
+    public void setCorreoInstitucional(String correoInstitucional) {
+        this.correoInstitucional = correoInstitucional;
+    }
+
+    // Alias para compatibilidad con código que use correo
+    public String getCorreo() {
+        return correoInstitucional;
     }
 
     public void setCorreo(String correo) {
+        this.correoInstitucional = correo;
+    }
 
-        this.correo = correo;
+    public String getContrasena() {
+        return contrasena;
+    }
+
+    public void setContrasena(String contrasena) {
+        this.contrasena = contrasena;
     }
 
     public String getRol() {
