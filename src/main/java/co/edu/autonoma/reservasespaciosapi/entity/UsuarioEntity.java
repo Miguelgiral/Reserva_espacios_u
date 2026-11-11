@@ -9,9 +9,15 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Entity
 @Table(name = "usuarios")
+@Getter
+@Setter
+@NoArgsConstructor
 public class UsuarioEntity {
 
     @Id
@@ -24,7 +30,7 @@ public class UsuarioEntity {
     @Column(name = "correo_institucional", nullable = false, unique = true, length = 180)
     private String correoInstitucional;
 
-    @Column(name = "contrasena", length = 255)
+    @Column(name = "contrasena", nullable = false, length = 255)
     private String contrasena;
 
     @Enumerated(EnumType.STRING)
@@ -34,47 +40,12 @@ public class UsuarioEntity {
     @Column(name = "activo", nullable = false)
     private Boolean activo = true;
 
-    /**
-     * Constructor vacío requerido por JPA.
-     */
-    protected UsuarioEntity() {
-    }
-
-    /**
-     * Constructor para registro de nuevos usuarios.
-     */
     public UsuarioEntity(String nombre, String correoInstitucional, String contrasena, RolUsuario rol) {
         this.nombre = nombre;
         this.correoInstitucional = correoInstitucional;
         this.contrasena = contrasena;
         this.rol = rol;
         this.activo = true;
-    }
-
-    // Getters y Setters
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getNombre() {
-        return nombre;
-    }
-
-    public void setNombre(String nombre) {
-        this.nombre = nombre;
-    }
-
-    public String getCorreoInstitucional() {
-        return correoInstitucional;
-    }
-
-    public void setCorreoInstitucional(String correoInstitucional) {
-        this.correoInstitucional = correoInstitucional;
     }
 
     // Alias para compatibilidad con código que use correo
@@ -84,29 +55,5 @@ public class UsuarioEntity {
 
     public void setCorreo(String correo) {
         this.correoInstitucional = correo;
-    }
-
-    public String getContrasena() {
-        return contrasena;
-    }
-
-    public void setContrasena(String contrasena) {
-        this.contrasena = contrasena;
-    }
-
-    public RolUsuario getRol() {
-        return rol;
-    }
-
-    public void setRol(RolUsuario rol) {
-        this.rol = rol;
-    }
-
-    public Boolean getActivo() {
-        return activo;
-    }
-
-    public void setActivo(Boolean activo) {
-        this.activo = activo;
     }
 }

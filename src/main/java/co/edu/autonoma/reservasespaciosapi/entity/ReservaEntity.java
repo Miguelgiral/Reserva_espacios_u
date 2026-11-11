@@ -14,9 +14,15 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Entity
 @Table(name = "reservas")
+@Getter
+@Setter
+@NoArgsConstructor
 public class ReservaEntity {
 
     @Id
@@ -41,9 +47,6 @@ public class ReservaEntity {
     @JoinColumn(name = "espacio_id", nullable = false)
     private EspacioEntity espacio;
 
-    protected ReservaEntity() {
-    }
-
     public ReservaEntity(LocalDateTime fechaInicio, LocalDateTime fechaFin, EstadoReserva estado) {
         this.fechaInicio = fechaInicio;
         this.fechaFin = fechaFin;
@@ -56,54 +59,6 @@ public class ReservaEntity {
         this.fechaFin = fechaFin;
         this.estado = estado;
         this.usuario = usuario;
-        this.espacio = espacio;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public LocalDateTime getFechaInicio() {
-        return fechaInicio;
-    }
-
-    public void setFechaInicio(LocalDateTime fechaInicio) {
-        this.fechaInicio = fechaInicio;
-    }
-
-    public LocalDateTime getFechaFin() {
-        return fechaFin;
-    }
-
-    public void setFechaFin(LocalDateTime fechaFin) {
-        this.fechaFin = fechaFin;
-    }
-
-    public EstadoReserva getEstado() {
-        return estado;
-    }
-
-    public void setEstado(EstadoReserva estado) {
-        this.estado = estado;
-    }
-
-    public UsuarioEntity getUsuario() {
-        return usuario;
-    }
-
-    public void setUsuario(UsuarioEntity usuario) {
-        this.usuario = usuario;
-    }
-
-    public EspacioEntity getEspacio() {
-        return espacio;
-    }
-
-    public void setEspacio(EspacioEntity espacio) {
         this.espacio = espacio;
     }
 }

@@ -1,14 +1,22 @@
 package co.edu.autonoma.reservasespaciosapi.entity;
 
+package co.edu.autonoma.reservasespaciosapi.entity;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Entity
 @Table(name = "espacios")
+@Getter
+@Setter
+@NoArgsConstructor
 public class EspacioEntity {
 
     @Id
@@ -27,72 +35,11 @@ public class EspacioEntity {
     @Column(name = "activo", nullable = false)
     private Boolean activo = true;
 
-    /**
-     * Constructor vacío requerido por JPA.
-     */
-    protected EspacioEntity() {
-    }
-
-    /**
-     * Constructor con campos principales.
-     */
     public EspacioEntity(String nombre, Integer capacidad, String ubicacion, Boolean activo) {
         this.nombre = nombre;
         this.capacidad = capacidad;
         this.ubicacion = ubicacion;
-        this.activo = activo;
-    }
-
-    /**
-     * Constructor alternativo compatible con DTOs.
-     */
-    public EspacioEntity(String nombre, String ubicacion, Integer capacidad, Boolean disponible) {
-        this.nombre = nombre;
-        this.ubicacion = ubicacion;
-        this.capacidad = capacidad;
-        this.activo = disponible;
-    }
-
-    // Getters y Setters
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getNombre() {
-        return nombre;
-    }
-
-    public void setNombre(String nombre) {
-        this.nombre = nombre;
-    }
-
-    public Integer getCapacidad() {
-        return capacidad;
-    }
-
-    public void setCapacidad(Integer capacidad) {
-        this.capacidad = capacidad;
-    }
-
-    public String getUbicacion() {
-        return ubicacion;
-    }
-
-    public void setUbicacion(String ubicacion) {
-        this.ubicacion = ubicacion;
-    }
-
-    public Boolean getActivo() {
-        return activo;
-    }
-
-    public void setActivo(Boolean activo) {
-        this.activo = activo;
+        this.activo = activo != null ? activo : true;
     }
 
     public Boolean getDisponible() {
