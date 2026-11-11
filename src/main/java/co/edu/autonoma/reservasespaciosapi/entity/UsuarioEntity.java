@@ -1,7 +1,10 @@
 package co.edu.autonoma.reservasespaciosapi.entity;
 
+import co.edu.autonoma.reservasespaciosapi.domain.RolUsuario;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -24,8 +27,9 @@ public class UsuarioEntity {
     @Column(name = "contrasena", length = 255)
     private String contrasena;
 
-    @Column(name = "rol", length = 50)
-    private String rol;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "rol", nullable = false, length = 50)
+    private RolUsuario rol;
 
     @Column(name = "activo", nullable = false)
     private Boolean activo = true;
@@ -37,24 +41,14 @@ public class UsuarioEntity {
     }
 
     /**
-     * Constructor compatible con DTOs de autenticación y registro.
+     * Constructor para registro de nuevos usuarios.
      */
-    public UsuarioEntity(String nombre, String correoInstitucional, String contrasena) {
-        this.nombre = nombre;
-        this.correoInstitucional = correoInstitucional;
-        this.contrasena = contrasena;
-        this.activo = true;
-    }
-
-    /**
-     * Constructor completo.
-     */
-    public UsuarioEntity(String nombre, String correoInstitucional, String contrasena, String rol, Boolean activo) {
+    public UsuarioEntity(String nombre, String correoInstitucional, String contrasena, RolUsuario rol) {
         this.nombre = nombre;
         this.correoInstitucional = correoInstitucional;
         this.contrasena = contrasena;
         this.rol = rol;
-        this.activo = activo;
+        this.activo = true;
     }
 
     // Getters y Setters
@@ -100,11 +94,11 @@ public class UsuarioEntity {
         this.contrasena = contrasena;
     }
 
-    public String getRol() {
+    public RolUsuario getRol() {
         return rol;
     }
 
-    public void setRol(String rol) {
+    public void setRol(RolUsuario rol) {
         this.rol = rol;
     }
 
