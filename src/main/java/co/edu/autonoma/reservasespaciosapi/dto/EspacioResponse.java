@@ -1,9 +1,10 @@
 package co.edu.autonoma.reservasespaciosapi.dto;
-
+import co.edu.autonoma.reservasespaciosapi.domain.TipoEspacio;
 public record EspacioResponse(
         Long id,
         String nombre,
-        String ubicacion,
+        TipoEspacio tipo,
         Integer capacidad,
-        Boolean disponible
+        String ubicacion,
+        Boolean activo
 ) { }
