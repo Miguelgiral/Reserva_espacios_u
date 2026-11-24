@@ -5,20 +5,31 @@ import java.util.List;
 
 import org.springframework.stereotype.Service;
 
+import co.edu.autonoma.reservasespaciosapi.domain.EstadoReserva;
 import co.edu.autonoma.reservasespaciosapi.domain.TipoEspacio;
 import co.edu.autonoma.reservasespaciosapi.dto.DisponibilidadResponse;
 import co.edu.autonoma.reservasespaciosapi.dto.EspacioRequest;
 import co.edu.autonoma.reservasespaciosapi.dto.EspacioResponse;
 import co.edu.autonoma.reservasespaciosapi.entity.EspacioEntity;
+import co.edu.autonoma.reservasespaciosapi.entity.ReservaEntity;
+import co.edu.autonoma.reservasespaciosapi.entity.RestriccionEntity;
 import co.edu.autonoma.reservasespaciosapi.repository.EspacioRepository;
+import co.edu.autonoma.reservasespaciosapi.repository.ReservaRepository;
+import co.edu.autonoma.reservasespaciosapi.repository.RestriccionRepository;
 
 @Service
 public class EspacioService {
 
     private final EspacioRepository espacioRepository;
+    private final ReservaRepository reservaRepository;
+    private final RestriccionRepository restriccionRepository;
 
-    public EspacioService(EspacioRepository espacioRepository) {
+    public EspacioService(EspacioRepository espacioRepository,
+                          ReservaRepository reservaRepository,
+                          RestriccionRepository restriccionRepository) {
         this.espacioRepository = espacioRepository;
+        this.reservaRepository = reservaRepository;
+        this.restriccionRepository = restriccionRepository;
     }
 
     public EspacioResponse crearEspacio(EspacioRequest request) {
@@ -73,15 +84,35 @@ public class EspacioService {
         EspacioEntity espacio = espacioRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("No se encontró el espacio con id: " + id));
 
-        if (fin.isBefore(inicio) || fin.isEqual(inicio)) {
+        // RN-04: La fecha final debe ser posterior a la fecha inicial
+        if (fin == null || inicio == null || !fin.isAfter(inicio)) {
             throw new IllegalArgumentException("La fecha final debe ser posterior a la fecha inicial (RN-04).");
         }
 
-        if (!espacio.getActivo()) {
-            return new DisponibilidadResponse(id, espacio.getNombre(), inicio, fin, false, "El espacio se encuentra inactivo para reservas (RN-03).");
+        // RN-03: Espacio inactivo
+        if (Boolean.FALSE.equals(espacio.getActivo())) {
+            return new DisponibilidadResponse(id, espacio.getNombre(), inicio, fin, false,
+                    "El espacio se encuentra inactivo para reservas (RN-03).");
         }
 
-        return new DisponibilidadResponse(id, espacio.getNombre(), inicio, fin, true, "Espacio disponible para reservar.");
+        // RN-03: Bloqueo por restricción
+        List<RestriccionEntity> restricciones = restriccionRepository
+                .findByEspacioIdAndFechaInicioLessThanEqualAndFechaFinGreaterThanEqual(id, fin, inicio);
+        if (!restricciones.isEmpty()) {
+            return new DisponibilidadResponse(id, espacio.getNombre(), inicio, fin, false,
+                    "El espacio se encuentra bloqueado por mantenimiento o evento institucional (RN-03).");
+        }
+
+        // RN-01: Solapamiento con otra reserva activa
+        List<ReservaEntity> reservasSolapadas = reservaRepository.buscarSolapamientos(
+                id, inicio, fin, EstadoReserva.CANCELADA);
+        if (!reservasSolapadas.isEmpty()) {
+            return new DisponibilidadResponse(id, espacio.getNombre(), inicio, fin, false,
+                    "El espacio no está disponible: ya cuenta con una reserva activa en esa franja (RN-01).");
+        }
+
+        return new DisponibilidadResponse(id, espacio.getNombre(), inicio, fin, true,
+                "Espacio disponible para reservar.");
     }
 
     private EspacioResponse mapearAResponse(EspacioEntity entity) {
