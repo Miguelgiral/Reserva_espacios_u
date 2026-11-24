@@ -4,9 +4,9 @@ import java.time.LocalDateTime;
 import co.edu.autonoma.reservasespaciosapi.domain.EstadoReserva;
 
 public record ReservaRequest(
+        Long usuarioId,
+        Long espacioId,
         LocalDateTime fechaInicio,
         LocalDateTime fechaFin,
-        EstadoReserva estado,
-        Long usuarioId,
-        Long espacioId
+        Integer cantidadAsistentes
 ) { }

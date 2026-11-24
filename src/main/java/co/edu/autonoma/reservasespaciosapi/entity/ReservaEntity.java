@@ -35,6 +35,9 @@ public class ReservaEntity {
     @Column(name = "fecha_fin", nullable = false)
     private LocalDateTime fechaFin;
 
+    @Column(name = "cantidad_asistentes", nullable = false)
+    private Integer cantidadAsistentes;
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 20)
     private EstadoReserva estado;
@@ -47,16 +50,11 @@ public class ReservaEntity {
     @JoinColumn(name = "espacio_id", nullable = false)
     private EspacioEntity espacio;
 
-    public ReservaEntity(LocalDateTime fechaInicio, LocalDateTime fechaFin, EstadoReserva estado) {
+    public ReservaEntity(LocalDateTime fechaInicio, LocalDateTime fechaFin, Integer cantidadAsistentes,
+                         EstadoReserva estado, UsuarioEntity usuario, EspacioEntity espacio) {
         this.fechaInicio = fechaInicio;
         this.fechaFin = fechaFin;
-        this.estado = estado;
-    }
-
-    public ReservaEntity(LocalDateTime fechaInicio, LocalDateTime fechaFin, EstadoReserva estado,
-                         UsuarioEntity usuario, EspacioEntity espacio) {
-        this.fechaInicio = fechaInicio;
-        this.fechaFin = fechaFin;
+        this.cantidadAsistentes = cantidadAsistentes;
         this.estado = estado;
         this.usuario = usuario;
         this.espacio = espacio;
