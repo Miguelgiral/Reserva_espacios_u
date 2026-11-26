@@ -15,7 +15,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.web.server.ResponseStatusException;
+
 
 import co.edu.autonoma.reservasespaciosapi.domain.EstadoReserva;
 import co.edu.autonoma.reservasespaciosapi.dto.ReservaRequest;
@@ -91,6 +91,11 @@ class ReservaServiceTest {
 
         // assert
         assertThat(resp.estado()).isEqualTo(EstadoReserva.CONFIRMADA);
+        assertThat(resp.usuarioId()).isEqualTo(req.usuarioId());
+        assertThat(resp.espacioId()).isEqualTo(req.espacioId());
+        assertThat(resp.fechaInicio()).isEqualTo(ini);
+        assertThat(resp.fechaFin()).isEqualTo(fin);
+        assertThat(resp.cantidadAsistentes()).isEqualTo(5);
         verify(reservaRepository).save(any(ReservaEntity.class));
     }
 
@@ -103,9 +108,11 @@ class ReservaServiceTest {
         LocalDateTime fin = ini.minusHours(1);
         ReservaRequest req = new ReservaRequest(1L, 10L, ini, fin, 5);
 
-        assertThrows(IllegalArgumentException.class,
-                () -> reservaService.crearReserva(req),
-                "La fecha final debe ser posterior a la fecha inicial (RN-04).");
+        IllegalArgumentException error = assertThrows(IllegalArgumentException.class,
+                () -> reservaService.crearReserva(req));
+
+        assertThat(error).hasMessage("La fecha final debe ser posterior a la fecha inicial (RN-04).");
+        verify(reservaRepository, never()).save(any(ReservaEntity.class));
     }
 
     // -----------------------------------------------------------------
@@ -120,9 +127,11 @@ class ReservaServiceTest {
         when(usuarioRepository.findById(usuario().getId())).thenReturn(Optional.of(usuario()));
         when(espacioRepository.findById(10L)).thenReturn(Optional.of(espacio(false, 20)));
 
-        assertThrows(IllegalStateException.class,
-                () -> reservaService.crearReserva(req),
-                "No se puede reservar un espacio inactivo (RN-03).");
+        IllegalStateException error = assertThrows(IllegalStateException.class,
+                () -> reservaService.crearReserva(req));
+
+        assertThat(error).hasMessage("No se puede reservar un espacio inactivo (RN-03).");
+        verify(reservaRepository, never()).save(any(ReservaEntity.class));
     }
 
     // -----------------------------------------------------------------
@@ -141,9 +150,11 @@ class ReservaServiceTest {
         when(reservaRepository.buscarSolapamientos(eq(10L), any(), any(), eq(EstadoReserva.CANCELADA)))
                 .thenReturn(List.of(reserva(ini.minusHours(1), ini.plusHours(1))));
 
-        assertThrows(IllegalStateException.class,
-                () -> reservaService.crearReserva(req),
-                "El espacio ya cuenta con una reserva activa en esa franja horaria (RN-01).");
+        IllegalStateException error = assertThrows(IllegalStateException.class,
+                () -> reservaService.crearReserva(req));
+
+        assertThat(error).hasMessage("El espacio ya cuenta con una reserva activa en esa franja horaria (RN-01).");
+        verify(reservaRepository, never()).save(any(ReservaEntity.class));
     }
 
     // -----------------------------------------------------------------
@@ -167,9 +178,11 @@ class ReservaServiceTest {
     void obtenerPorId_noExiste_lanzaIllegalArgumentException() {
         when(reservaRepository.findById(999L)).thenReturn(Optional.empty());
 
-        assertThrows(IllegalArgumentException.class,
-                () -> reservaService.obtenerPorId(999L),
-                "Reserva no encontrada con id: 999");
+        IllegalArgumentException error = assertThrows(IllegalArgumentException.class,
+                () -> reservaService.obtenerPorId(999L));
+
+        assertThat(error).hasMessage("Reserva no encontrada con id: 999");
+        verify(reservaRepository, never()).save(any(ReservaEntity.class));
     }
 
     // -----------------------------------------------------------------
@@ -203,9 +216,11 @@ class ReservaServiceTest {
 
         when(reservaRepository.findById(entidad.getId())).thenReturn(Optional.of(entidad));
 
-        assertThrows(IllegalStateException.class,
-                () -> reservaService.cancelarReserva(entidad.getId()),
-                "No es posible cancelar la reserva: ya ha iniciado o ha pasado su fecha de inicio (RN-05).");
+        IllegalStateException error = assertThrows(IllegalStateException.class,
+                () -> reservaService.cancelarReserva(entidad.getId()));
+
+        assertThat(error).hasMessage("No es posible cancelar la reserva: ya ha iniciado o ha pasado su fecha de inicio (RN-05).");
+        verify(reservaRepository, never()).save(any(ReservaEntity.class));
     }
 
     // -----------------------------------------------------------------
@@ -220,8 +235,24 @@ class ReservaServiceTest {
 
         when(reservaRepository.findById(entidad.getId())).thenReturn(Optional.of(entidad));
 
-        assertThrows(IllegalStateException.class,
-                () -> reservaService.cancelarReserva(entidad.getId()),
-                "La reserva ya se encuentra cancelada.");
+        IllegalStateException error = assertThrows(IllegalStateException.class,
+                () -> reservaService.cancelarReserva(entidad.getId()));
+
+        assertThat(error).hasMessage("La reserva ya se encuentra cancelada.");
+        verify(reservaRepository, never()).save(any(ReservaEntity.class));
+    }
+
+    @Test
+    void cancelarReserva_inexistente_noGuardaNada() {
+        // Arrange
+        when(reservaRepository.findById(999L)).thenReturn(Optional.empty());
+
+        // Act
+        IllegalArgumentException error = assertThrows(IllegalArgumentException.class,
+                () -> reservaService.cancelarReserva(999L));
+
+        // Assert
+        assertThat(error).hasMessage("Reserva no encontrada con id: 999");
+        verify(reservaRepository, never()).save(any(ReservaEntity.class));
     }
 }
